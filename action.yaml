@@ -1,6 +1,6 @@
 name: Tweeter Action
 author: DevOps for Go
-description: Simple action to send a tweet via an GitHub Action.
+description: Action to send a tweet via a GitHub Action.
 inputs:
   message:
     description: 'message you want to tweet'
@@ -21,10 +21,10 @@ outputs:
   errorMessage:
     description: 'if something went wrong, the error message'
   sentMessage:
-    description: 'message sent to Twitter'
+    description: 'the message sent to Twitter'
 runs:
   using: docker
-  image: docker://ghcr.io/packtpublishing/tweeter:1.0.0
+  image: Dockerfile
   args:
     - --message
     - "${{ inputs.message }}"
@@ -36,3 +36,20 @@ runs:
     - ${{ inputs.accessToken }}
     - --accessTokenSecret
     - ${{ inputs.accessTokenSecret }}
+jobs:
+test-action:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+    - name: test the tweeter action in DRY_RUN
+      id: tweeterAction
+      env:
+        DRY_RUN: true
+      uses: ./
+      with:
+        message: hello world!
+        accessToken: fake
+        accessTokenSecret: fake
+        apiKey: fake
+        apiKeySecret: fake
+    - run: echo ${{ steps.tweeterAction.outputs.sentMessage}} from dry run test
