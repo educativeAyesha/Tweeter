@@ -10,22 +10,25 @@ on:
       - main
 jobs:
   test:
-    permissions:
-      contents: read
-    strategy:
-      matrix:
-        go-version: [ 1.16.x, 1.17.x ]
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
+    # continuous integration job omitted for brevity
+  release:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
     steps:
-      - name: install go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go-version }}
-      - uses: actions/checkout@v2
-      - name: lint with golangci-lint
-        uses: golangci/golangci-lint-action@v2
-         with:
-          args: --timeout 10m0s
-      - name: run go test
-        run: go test ./...
+     - uses: actions/checkout@v2
+     - name: Set RELEASE_VERSION ENV var
+      run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+    - uses: actions/setup-go@v2
+      with:
+      go-version: 1.17.x
+    - name: install gox
+      run: go install github.com/mitchellh/gox@v1.0.1
+    - name: build cross-platform binaries
+      env:
+        PLATFORMS: darwin/amd64 darwin/arm64 windows/amd64 linux/amd64 linux/arm64
+        VERSION_INJECT: github.com/PacktPublishing/Go-for-DevOps/chapter/10/pkg/tweeter.Version
+        OUTPUT_PATH_FORMAT: ./bin/${{ env.RELEASE_VERSION }}/{{.OS}}/{{.Arch}}/tweeter
+      run: |
+        gox -osarch="${PLATFORMS}" -ldflags "-X ${VERSION_INJECT}=${RELEASE_VERSION}" -output "${OUTPUT_PATH_FORMAT}"      
+        

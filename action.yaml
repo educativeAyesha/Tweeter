@@ -1,55 +1,19 @@
-name: Tweeter Action
-author: DevOps for Go
-description: Action to send a tweet via a GitHub Action.
+name: tweeter
+author: @Ayesha
+description: Description of your action
+branding:
+  icon: message-circle
+  color: blue
 inputs:
-  message:
-    description: 'message you want to tweet'
-    required: true
-  apiKey:
-    description: 'api key for Twitter api'
-    required: true
-  apiKeySecret:
-    description: 'api key secret for Twitter api'
-    required: true
-  accessToken:
-    description: 'access token for Twitter api'
-    required: true
-  accessTokenSecret:
-    description: 'access token secret for Twitter api'
+  sample:
+    description: sample description
     required: true
 outputs:
-  errorMessage:
-    description: 'if something went wrong, the error message'
-  sentMessage:
-    description: 'the message sent to Twitter'
+  sampleOutput:
+    description: some sample output
 runs:
   using: docker
   image: Dockerfile
   args:
-    - --message
-    - "${{ inputs.message }}"
-    - --apiKey
-    - ${{ inputs.apiKey }}
-    - --apiKeySecret
-    - ${{ inputs.apiKeySecret }}
-    - --accessToken
-    - ${{ inputs.accessToken }}
-    - --accessTokenSecret
-    - ${{ inputs.accessTokenSecret }}
-jobs:
-test-action:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v2
-    - name: test the tweeter action in DRY_RUN
-      id: tweeterAction
-      env:
-        DRY_RUN: true
-      uses: ./
-      with:
-        message: hello world!
-        accessToken: fake
-        accessTokenSecret: fake
-        apiKey: fake
-        apiKeySecret: fake
-    - run: echo ${{ steps.tweeterAction.outputs.sentMessage}} from dry run test
+  - --sample
+  - "${{ inputs.sample }}"
