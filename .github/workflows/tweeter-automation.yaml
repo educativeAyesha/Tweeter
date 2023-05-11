@@ -29,6 +29,9 @@ jobs:
           args: --timeout 10m0s
       - name: run go test
         run: go test ./...
+        with:
+          args: --message foo
+
   test-action:
     permissions:
       contents: read
